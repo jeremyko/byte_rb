@@ -2,6 +2,11 @@
 
 byte ring buffer for rust.
 
+
+https://crates.io/crates/byte_rb
+
+[Documentation](https://docs.rs/byte_rb)
+
 ## Installation
 
 To use `byte_rb`, first add this to your `Cargo.toml`:
