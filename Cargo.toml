@@ -1,8 +1,9 @@
 [package]
 name = "byte_rb"
+authors = ["JungHyun Ko <jeremyko69@gmail.mail>"]
 version = "1.0.0"
 description ="byte ring buffer"
-keywords = ["byte buffer","ring buffer"]
+keywords = ["byte_buffer","ring_buffer"]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/jeremyko/byte_rb"
