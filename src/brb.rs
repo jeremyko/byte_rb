@@ -107,7 +107,7 @@ impl BrBuffer {
     /// | values  |
     /// | --- |
     /// | Err((-20001,[`byte_rb::ERR_STR_INVALID_LEN`](ERR_STR_INVALID_LEN) )) |
-    /// | Err((-20002,[`byte_rb::ERR_STR_BUFFER_FULL`](ERR_STR_BUFFER_FULL) )) |
+    /// | Err((-20002,[`byte_rb::ERR_STR_INVALID_LEN`](ERR_STR_INVALID_LEN) )) |
     pub fn get(&mut self, len: usize) -> Result<&[u8], (i32, &str)> {
         self.debug_me(None, len, "get before", line!());
 
