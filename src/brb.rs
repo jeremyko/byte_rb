@@ -1,3 +1,5 @@
+use std::fmt;
+
 //==============================================================================
 macro_rules! dbg_log {
     ($($arg:tt)*) => (#[cfg(debug_assertions)] println!($($arg)*));
@@ -12,6 +14,20 @@ pub struct BrBuffer {
     wpos: usize,
     cumulated_len: usize,
     contiguous: Vec<u8>,
+}
+
+//==============================================================================
+impl fmt::Debug for BrBuffer {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("[BrBuffer] => ")
+            .field("buffer", &self.buffer)
+            .field("buffer len", &self.buffer_len)
+            .field("rpos", &self.rpos)
+            .field("wpos", &self.wpos)
+            .field("cumulated_len", &self.cumulated_len)
+            .field("contiguous", &self.contiguous)
+            .finish()
+    }
 }
 
 //==============================================================================

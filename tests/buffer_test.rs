@@ -30,6 +30,7 @@ fn basic_contiguous() {
     assert_eq!(result, b"abcdef");
 
     assert_eq!(cbuf.capacity(), 6);
+    println!("{:?}", cbuf);
 }
 
 //==============================================================================
@@ -68,6 +69,7 @@ fn non_contiguous() {
     assert_eq!(cbuf.cumulated_len(), 0);
 
     assert_eq!(cbuf.capacity(), 6);
+    println!("{:?}", cbuf);
 }
 
 //==============================================================================
@@ -76,6 +78,7 @@ fn too_long() {
     let mut cbuf = BrBuffer::new(2);
     let err_rslt = cbuf.append(3, b"123");
     assert_eq!(err_rslt, Err((-10001, byte_rb::ERR_STR_INVALID_LEN)));
+    println!("{:?}", cbuf);
 }
 
 //==============================================================================
@@ -85,6 +88,7 @@ fn buffer_full() {
     assert!(cbuf.append(3, b"123").unwrap());
     let err_rslt = cbuf.append(1, b"4");
     assert_eq!(err_rslt, Err((-10002, byte_rb::ERR_STR_BUFFER_FULL)));
+    println!("{:?}", cbuf);
 }
 
 //==============================================================================
@@ -115,4 +119,5 @@ fn buffer_full_non_contiguous() {
 
     let err_rslt = cbuf.append(2, b"89");
     assert_eq!(err_rslt, Err((-10003, byte_rb::ERR_STR_BUFFER_FULL)));
+    println!("{:?}", cbuf);
 }

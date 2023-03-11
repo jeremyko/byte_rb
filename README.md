@@ -27,6 +27,7 @@ cargo add byte_rb
 use byte_rb::BrBuffer;
 
 let mut cbuf = BrBuffer::new(6);
+println!("{:?}", cbuf);
 
 assert!(cbuf.append(6, b"123456").unwrap());
 assert_eq!(cbuf.rpos(), 0);
