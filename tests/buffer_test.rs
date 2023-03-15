@@ -42,6 +42,10 @@ fn non_contiguous() {
     assert_eq!(cbuf.rpos(), 0);
     assert_eq!(cbuf.wpos(), 6);
     // "123456"
+    let result = cbuf.peek(3).unwrap();
+    assert_eq!(result, b"123");
+    assert_eq!(cbuf.cumulated_len(), 6);
+
     let result = cbuf.get(3).unwrap();
     assert_eq!(result, b"123");
     assert_eq!(cbuf.cumulated_len(), 3);
@@ -113,11 +117,19 @@ fn buffer_full_non_contiguous() {
 
     assert!(cbuf.append(1, b"7").unwrap());
     // "7 3456"
+    let result = cbuf.peek(5).unwrap();
+    assert_eq!(result, b"34567");
+
     assert_eq!(cbuf.cumulated_len(), 5);
     assert_eq!(cbuf.rpos(), 2);
     assert_eq!(cbuf.wpos(), 1);
 
     let err_rslt = cbuf.append(2, b"89");
     assert_eq!(err_rslt, Err((-10003, byte_rb::ERR_STR_BUFFER_FULL)));
+
+    let result = cbuf.get(5).unwrap();
+    assert_eq!(result, b"34567");
+    assert_eq!(cbuf.cumulated_len(), 0);
+
     println!("{:?}", cbuf);
 }

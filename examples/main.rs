@@ -12,6 +12,10 @@ fn main() {
     assert_eq!(cbuf.rpos(), 0);
     assert_eq!(cbuf.wpos(), 6);
     // "123456"
+    let result = cbuf.peek(3).unwrap();
+    assert_eq!(result, b"123");
+    assert_eq!(cbuf.cumulated_len(), 6);
+
     let result = cbuf.get(3).unwrap();
     assert_eq!(result, b"123");
     assert_eq!(cbuf.cumulated_len(), 3);

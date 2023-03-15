@@ -125,8 +125,26 @@ impl BrBuffer {
     /// | Err((-20001,[`byte_rb::ERR_STR_INVALID_LEN`](ERR_STR_INVALID_LEN) )) |
     /// | Err((-20002,[`byte_rb::ERR_STR_INVALID_LEN`](ERR_STR_INVALID_LEN) )) |
     pub fn get(&mut self, len: usize) -> Result<&[u8], (i32, &str)> {
-        self.debug_me(None, len, "get before", line!());
+        return self.get_peek_common(len, true);
+    }
 
+    //--------------------------------------------------------------------------
+    /// Data peeping function. It returns data in the same way as the `get` function,
+    /// but does not change the internal state. The actual data should be consumed using the `get` function.
+    ///
+    /// # Errors
+    ///
+    /// | values  |
+    /// | --- |
+    /// | Err((-20001,[`byte_rb::ERR_STR_INVALID_LEN`](ERR_STR_INVALID_LEN) )) |
+    /// | Err((-20002,[`byte_rb::ERR_STR_INVALID_LEN`](ERR_STR_INVALID_LEN) )) |
+    pub fn peek(&mut self, len: usize) -> Result<&[u8], (i32, &str)> {
+        return self.get_peek_common(len, false);
+    }
+
+    //--------------------------------------------------------------------------
+    /// Defines common features of `get` and `peek` functions.
+    fn get_peek_common(&mut self, len: usize, is_get: bool) -> Result<&[u8], (i32, &str)> {
         if self.wpos > self.rpos {
             if self.wpos < self.rpos + len {
                 eprintln!("error ({}) -> {}", line!(), ERR_STR_INVALID_LEN);
@@ -134,38 +152,44 @@ impl BrBuffer {
             } else {
                 dbg_log!("get : general case");
                 let rslt_slice = &self.buffer[self.rpos..(self.rpos + len)];
-                self.rpos += len;
-                self.cumulated_len -= len;
-                self.debug_me(None, len, "get after", line!());
+                if is_get {
+                    self.rpos += len;
+                    self.cumulated_len -= len;
+                }
+                // self.debug_me(None, len, "get after", line!());
                 Ok(rslt_slice)
             }
         } else {
-            dbg_log!("get : reversed : rpos >= wpos ");
+            // dbg_log!("get : reversed : rpos >= wpos ");
             if self.buffer_len < self.rpos + len {
                 let first_block_len = self.buffer_len - self.rpos;
                 let second_block_len = len - first_block_len;
                 dbg_log!("{},{}", first_block_len, second_block_len);
                 if self.wpos > 0 && self.wpos >= second_block_len {
                     // to combine 2 parts
-                    dbg_log!("get : reversed (need to combine 2 parts)");
+                    // dbg_log!("get : reversed (need to combine 2 parts)");
                     let slice1 = &self.buffer[self.rpos..self.rpos + first_block_len];
                     let slice2 = &self.buffer[..second_block_len];
-                    self.rpos = second_block_len;
-                    self.cumulated_len -= len;
+                    if is_get {
+                        self.rpos = second_block_len;
+                        self.cumulated_len -= len;
+                    }
                     //XXX
                     self.contiguous = [slice1, slice2].concat();
-                    self.debug_me(None, len, "get after", line!());
+                    // self.debug_me(None, len, "get after", line!());
                     Ok(self.contiguous.as_slice())
                 } else {
                     eprintln!("error ({}) -> {}", line!(), ERR_STR_INVALID_LEN);
                     Err((-20002, ERR_STR_INVALID_LEN))
                 }
             } else {
-                dbg_log!("get : reversed (no need to combine)");
+                // dbg_log!("get : reversed (no need to combine)");
                 let rslt_slice = &self.buffer[self.rpos..(self.rpos + len)];
-                self.rpos += len;
-                self.cumulated_len -= len;
-                self.debug_me(None, len, "get after", line!());
+                if is_get {
+                    self.rpos += len;
+                    self.cumulated_len -= len;
+                }
+                // self.debug_me(None, len, "get after", line!());
                 Ok(rslt_slice)
             }
         }

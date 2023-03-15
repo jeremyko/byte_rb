@@ -33,6 +33,13 @@ assert!(cbuf.append(6, b"123456").unwrap());
 assert_eq!(cbuf.rpos(), 0);
 assert_eq!(cbuf.wpos(), 6);
 // "123456"
+
+// Peek at data without changing its internal state.
+let result = cbuf.peek(3).unwrap();
+assert_eq!(result, b"123");
+assert_eq!(cbuf.cumulated_len(), 6);
+
+// Consume data
 let result = cbuf.get(3).unwrap();
 assert_eq!(result, b"123");
 assert_eq!(cbuf.cumulated_len(), 3);
