@@ -1,9 +1,9 @@
 use std::fmt;
 
 //==============================================================================
-macro_rules! dbg_log {
-    ($($arg:tt)*) => (#[cfg(debug_assertions)] println!($($arg)*));
-}
+// macro_rules! dbg_log {
+//     ($($arg:tt)*) => (#[cfg(debug_assertions)] println!($($arg)*));
+// }
 pub const ERR_STR_INVALID_LEN: &str = "invalid length";
 pub const ERR_STR_BUFFER_FULL: &str = "buffer is full";
 //==============================================================================
@@ -59,7 +59,7 @@ impl BrBuffer {
     /// | Err((-10004,[`byte_rb::ERR_STR_BUFFER_FULL`](ERR_STR_BUFFER_FULL) )) |
 
     pub fn append(&mut self, len: usize, data: &[u8]) -> Result<bool, (i32, &str)> {
-        self.debug_me(Some(data), len, "append before", line!());
+        // self.debug_me(Some(data), len, "append before", line!());
         if self.buffer_len < len {
             eprintln!("error ({}) -> {}", line!(), ERR_STR_INVALID_LEN);
             return Err((-10001, ERR_STR_INVALID_LEN));
@@ -69,25 +69,25 @@ impl BrBuffer {
         }
         if self.rpos > self.wpos {
             if self.rpos - self.wpos >= len {
-                dbg_log!("append : rpos > wpos (reversed and free space exists)");
+                // dbg_log!("append : rpos > wpos (reversed and free space exists)");
                 self.buffer[self.wpos..(self.wpos + len)].copy_from_slice(data);
                 self.wpos += len;
                 self.cumulated_len += len;
-                self.debug_me(Some(data), len, "append after", line!());
+                // self.debug_me(Some(data), len, "append after", line!());
                 Ok(true)
             } else {
                 eprintln!("error ({}) -> {}", line!(), ERR_STR_BUFFER_FULL);
                 Err((-10003, ERR_STR_BUFFER_FULL))
             }
         } else {
-            dbg_log!("append : wpos >= rpos (not reversed)");
+            // dbg_log!("append : wpos >= rpos (not reversed)");
             if self.buffer_len < self.wpos + len {
-                dbg_log!("append : wpos 이후 버퍼로 모자라는 경우");
+                // dbg_log!("append : wpos 이후 버퍼로 모자라는 경우");
                 if (self.wpos > 0) && (len - (self.buffer_len - self.wpos) <= self.rpos) {
-                    dbg_log!("append  : 2번 나누어서 들어갈 공간이 있는 경우");
+                    // dbg_log!("append  : 2번 나누어서 들어갈 공간이 있는 경우");
                     let first_block_len = self.buffer_len - self.wpos;
                     let second_block_len = len - first_block_len;
-                    dbg_log!("first {},second {}", first_block_len, second_block_len);
+                    // dbg_log!("first {},second {}", first_block_len, second_block_len);
                     if first_block_len > 0 {
                         self.buffer[self.wpos..self.wpos + first_block_len]
                             .copy_from_slice(&data[..first_block_len]);
@@ -97,19 +97,19 @@ impl BrBuffer {
                     );
                     self.wpos = second_block_len;
                     self.cumulated_len += len;
-                    self.debug_me(Some(data), len, "append after", line!());
+                    // self.debug_me(Some(data), len, "append after", line!());
                     Ok(true)
                 } else {
-                    dbg_log!("append : 2번 나누어서 들어갈 공간 없는 경우");
+                    // dbg_log!("append : 2번 나누어서 들어갈 공간 없는 경우");
                     eprintln!("error ({}) -> {}", line!(), ERR_STR_BUFFER_FULL);
                     Err((-10004, ERR_STR_BUFFER_FULL))
                 }
             } else {
-                dbg_log!("append : most general case");
+                // dbg_log!("append : most general case");
                 self.buffer[self.wpos..(self.wpos + len)].copy_from_slice(data);
                 self.wpos += len;
                 self.cumulated_len += len;
-                self.debug_me(Some(data), len, "append after", line!());
+                // self.debug_me(Some(data), len, "append after", line!());
                 Ok(true)
             }
         }
@@ -150,7 +150,7 @@ impl BrBuffer {
                 eprintln!("error ({}) -> {}", line!(), ERR_STR_INVALID_LEN);
                 Err((-20001, ERR_STR_INVALID_LEN))
             } else {
-                dbg_log!("get : general case");
+                // dbg_log!("get : general case");
                 let rslt_slice = &self.buffer[self.rpos..(self.rpos + len)];
                 if is_get {
                     self.rpos += len;
@@ -164,7 +164,7 @@ impl BrBuffer {
             if self.buffer_len < self.rpos + len {
                 let first_block_len = self.buffer_len - self.rpos;
                 let second_block_len = len - first_block_len;
-                dbg_log!("{},{}", first_block_len, second_block_len);
+                // dbg_log!("{},{}", first_block_len, second_block_len);
                 if self.wpos > 0 && self.wpos >= second_block_len {
                     // to combine 2 parts
                     // dbg_log!("get : reversed (need to combine 2 parts)");
@@ -216,20 +216,20 @@ impl BrBuffer {
         self.wpos
     }
     //--------------------------------------------------------------------------
-    #[cfg(debug_assertions)]
-    fn debug_me(&self, _data: Option<&[u8]>, _data_len: usize, _msg: &str, _fline: u32) {
-        println!(
-            "{} ({}) : {:?}, buffer_len={}, len={}, rpos={}, wpos={}, cumulated={}",
-            _msg,
-            _fline,
-            _data,
-            self.buffer_len,
-            _data_len,
-            self.rpos,
-            self.wpos,
-            self.cumulated_len
-        );
-    }
-    #[cfg(not(debug_assertions))]
-    fn debug_me(&self, _data: Option<&[u8]>, _data_len: usize, _msg: &str, _fline: u32) {}
+    // #[cfg(debug_assertions)]
+    // fn debug_me(&self, _data: Option<&[u8]>, _data_len: usize, _msg: &str, _fline: u32) {
+    //     println!(
+    //         "{} ({}) : {:?}, buffer_len={}, len={}, rpos={}, wpos={}, cumulated={}",
+    //         _msg,
+    //         _fline,
+    //         _data,
+    //         self.buffer_len,
+    //         _data_len,
+    //         self.rpos,
+    //         self.wpos,
+    //         self.cumulated_len
+    //     );
+    // }
+    // #[cfg(not(debug_assertions))]
+    // fn debug_me(&self, _data: Option<&[u8]>, _data_len: usize, _msg: &str, _fline: u32) {}
 }
